@@ -1,6 +1,5 @@
 import aiohttp
 import json
-import requests
 
 url_crawl = ['https://giaoducthoidai.vn/tra-cuu-diem-thi.html', 'https://vtv.vn/tra-cuu-diem-thi-thpt.htm']
 
@@ -18,7 +17,17 @@ async def crawl_product(sbd):
             r = await client.get(url, headers = headers)
             data = await r.text()
             data = json.loads(data)[0]
-            print(data)
+            record = \
+                        data['SOBAODANH'] + ',' + \
+                        data['TOAN'] + ',' + \
+                        data['VAN'] + ',' + \
+                        data['NGOAI_NGU'] + ',' + \
+                        data['LY'] + ',' + \
+                        data['HOA'] + ',' + \
+                        data['SINH'] + ',' + \
+                        data['SU'] + ',' + \
+                        data['DIA'] + ',' + data['GIAO_DUC_CONG_DAN'] + ',' + data['MA_MON_NGOAI_NGU']
+            # print(record)
+            return {"success": record}
         except Exception as e:
-            print(f"Lỗi khác khi lấy dữ liệu cho SBD {sbd}: {e}")
-        return None
+            return {"failed": sbd}

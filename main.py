@@ -1,7 +1,6 @@
 import asyncio
 import time
 
-
 from fetch import crawl_product
 
 
@@ -16,8 +15,9 @@ async def run_limit_worker(tasks, limit: int = 100):
 
     await asyncio.gather(*(sem_task(task) for task in tasks))
         
-
-max_students_each_province = 108700
+        
+# //108700
+max_students_each_province = 1
 async def run_all_workers():
     tasks = []
     for province_code in range (1,2):
