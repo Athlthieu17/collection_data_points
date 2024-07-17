@@ -19,11 +19,11 @@ async def run_limit_worker(tasks, limit: int = 100):
         
         
 # //108700
-max_students_each_province = 1000
+max_students_each_province = 50000
 async def run_all_workers():
     tasks = []
-    error_sbd = []
-    for province_code in range (1,2):
+    for province_code in range (3,30):
+        error_sbd = []
         with open(f'./output/{province_code}_output.csv', 'w', encoding='utf8') as f:
             csv_header = 'sbd, toan, ngu_van, ngoai_ngu, vat_li, hoa_hoc, sinh_hoc, lich_su, dia_li, gdcd, ma_nn\n'
             f.write(csv_header)
@@ -54,9 +54,9 @@ async def run_all_workers():
 
             # Clear tasks for the next province (if you have multiple provinces)
             tasks.clear()   
-    with open('error_sbd.txt', 'a') as f:
-                for x in error_sbd:
-                    f.write(str(x) + '\n')
+        with open('error_sbd.txt', 'a') as f:
+                    for x in error_sbd:
+                        f.write(str(x) + '\n')
 
 if __name__ == '__main__':
     start_time = time.time()
