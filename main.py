@@ -1,7 +1,9 @@
 import asyncio
 import time
-import aiohttp
-import json
+
+
+from fetch import crawl_product
+
 
 province_codes = [i for i in range(1, 65) if i != 20]
 
@@ -13,32 +15,9 @@ async def run_limit_worker(tasks, limit: int = 100):
             return await task
 
     await asyncio.gather(*(sem_task(task) for task in tasks))
-
-
-async def crawl_product(sbd):
-    headers = {
-        "Accept-Encoding": "gzip, deflate, br, zstd",
-        "Sec-Ch-Ua": '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
-        "Accept-Language": "vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5",
-        "Referer": "https://vtv.vn/",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
-    }
-    url = "https://vtvapi3.vtv.vn/handlers/timdiemthi.ashx?keywords=" + str(sbd)
-    async with aiohttp.ClientSession() as client:
-        try:
-            r = await client.get(url, headers = headers)
-            data = await r.text()
-            data = json.loads(data)[0]
-            print(data)
-        except Exception as e:
-            print(f"Lỗi khác khi lấy dữ liệu cho SBD {sbd}: {e}")
-        return None
         
-        
-        
-            # todo: process your output here
 
-max_students_each_province = 1000
+max_students_each_province = 108700
 async def run_all_workers():
     tasks = []
     for province_code in range (1,2):
