@@ -26,6 +26,7 @@ async def run_all_workers():
     for province_code in range (1,2):
         with open(f'./output/{province_code}_output.csv', 'w', encoding='utf8') as f:
             csv_header = 'sbd, toan, ngu_van, ngoai_ngu, vat_li, hoa_hoc, sinh_hoc, lich_su, dia_li, gdcd, ma_nn\n'
+            f.write(csv_header)
             print('Start')
             print(f'--------------------------------------------{province_code}---------------------------')
             if province_code in range(1, 10):
@@ -48,7 +49,7 @@ async def run_all_workers():
                 try:
                     f.write(result + '\n')
                 except:
-                    error_sbd.append(sbd)
+                    error_sbd.append(result)
                 # You can also process the result here if needed
 
             # Clear tasks for the next province (if you have multiple provinces)

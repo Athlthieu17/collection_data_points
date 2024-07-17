@@ -29,4 +29,4 @@ async def crawl_product(sbd) -> dict:
             # print(record)
             return record
         except Exception as e:
-            return {"process": 'failed', 'sbd': sbd}
+            return sbd
