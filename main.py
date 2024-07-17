@@ -13,34 +13,49 @@ async def run_limit_worker(tasks, limit: int = 100):
         async with semaphore:
             return await task
 
-    await asyncio.gather(*(sem_task(task) for task in tasks))
+    for future in asyncio.as_completed([sem_task(task) for task in tasks]):
+        result = await future
+        yield result  # Yield the result of the completed task
         
         
 # //108700
-max_students_each_province = 1
+max_students_each_province = 1000
 async def run_all_workers():
     tasks = []
+    error_sbd = []
     for province_code in range (1,2):
-        print('Start')
-        print(f'--------------------------------------------{province_code}---------------------------')
-        if province_code in range(1, 10):
-            start_sbd = int('0' + str(province_code) + '0' * 6)
-        else:
-            start_sbd = int(str(province_code) + '0' * 6)
-        end_sbd = start_sbd + max_students_each_province
-        products = []
-        for sbd in range(int(start_sbd), int(end_sbd) + 1):
-            # Chuyển đổi sbd sang chuỗi và thêm 0 nếu cần thiết
-            sbd_str = str(sbd)
-            if len(sbd_str) == 7:
-                    sbd_str = "0" + sbd_str
-            products.append(sbd_str)
-        print(products)
-        for product in products:
-            tasks.append(crawl_product(product))
+        with open(f'./output/{province_code}_output.csv', 'w', encoding='utf8') as f:
+            csv_header = 'sbd, toan, ngu_van, ngoai_ngu, vat_li, hoa_hoc, sinh_hoc, lich_su, dia_li, gdcd, ma_nn\n'
+            print('Start')
+            print(f'--------------------------------------------{province_code}---------------------------')
+            if province_code in range(1, 10):
+                start_sbd = int('0' + str(province_code) + '0' * 6)
+            else:
+                start_sbd = int(str(province_code) + '0' * 6)
+            end_sbd = start_sbd + max_students_each_province
+            products = []
+            for sbd in range(int(start_sbd), int(end_sbd) + 1):
+                # Chuyển đổi sbd sang chuỗi và thêm 0 nếu cần thiết
+                sbd_str = str(sbd)
+                if len(sbd_str) == 7:
+                        sbd_str = "0" + sbd_str
+                products.append(sbd_str)
+            for product in products:
+                task = crawl_product(product)
+                tasks.append(task)
 
-    await run_limit_worker(tasks, limit=100)
+            async for result in run_limit_worker(tasks, limit=100):
+                try:
+                    f.write(result + '\n')
+                except:
+                    error_sbd.append(sbd)
+                # You can also process the result here if needed
 
+            # Clear tasks for the next province (if you have multiple provinces)
+            tasks.clear()   
+    with open('error_sbd.txt', 'a') as f:
+                for x in error_sbd:
+                    f.write(str(x) + '\n')
 
 if __name__ == '__main__':
     start_time = time.time()

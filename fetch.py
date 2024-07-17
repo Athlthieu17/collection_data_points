@@ -1,9 +1,8 @@
 import aiohttp
 import json
-
 url_crawl = ['https://giaoducthoidai.vn/tra-cuu-diem-thi.html', 'https://vtv.vn/tra-cuu-diem-thi-thpt.htm']
 
-async def crawl_product(sbd):
+async def crawl_product(sbd) -> dict:
     headers = {
         "Accept-Encoding": "gzip, deflate, br, zstd",
         "Sec-Ch-Ua": '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
@@ -28,6 +27,6 @@ async def crawl_product(sbd):
                         data['SU'] + ',' + \
                         data['DIA'] + ',' + data['GIAO_DUC_CONG_DAN'] + ',' + data['MA_MON_NGOAI_NGU']
             # print(record)
-            return {"success": record}
+            return record
         except Exception as e:
-            return {"failed": sbd}
+            return {"process": 'failed', 'sbd': sbd}
