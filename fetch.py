@@ -13,20 +13,36 @@ async def crawl_product(sbd) -> dict:
     url = "https://vtvapi3.vtv.vn/handlers/timdiemthi.ashx?keywords=" + str(sbd)
     async with aiohttp.ClientSession() as client:
         try:
-            r = await client.get(url, headers = headers)
-            data = await r.text()
-            data = json.loads(data)[0]
-            record = \
-                        data['SOBAODANH'] + ',' + \
-                        data['TOAN'] + ',' + \
-                        data['VAN'] + ',' + \
-                        data['NGOAI_NGU'] + ',' + \
-                        data['LY'] + ',' + \
-                        data['HOA'] + ',' + \
-                        data['SINH'] + ',' + \
-                        data['SU'] + ',' + \
-                        data['DIA'] + ',' + data['GIAO_DUC_CONG_DAN'] + ',' + data['MA_MON_NGOAI_NGU']
-            # print(record)
-            return record
-        except Exception as e:
-            return sbd
+            async with client.get(url, headers=headers) as response:
+                response.raise_for_status()  # Raise an exception for non-2xx status codes
+                data = await response.text()
+                data = json.loads(data)[0]
+
+                if not data:  # Check for empty response
+                    return {'process': 0, 'data': sbd}
+
+                # Extract scores, assuming the data structure remains consistent
+                record = ",".join([str(data[key]) for key in ['SOBAODANH', 'TOAN', 'VAN', 'NGOAI_NGU', 'LY', 'HOA', 'SINH', 'SU', 'DIA', 'GIAO_DUC_CONG_DAN', 'MA_MON_NGOAI_NGU']])
+                return {'process': 1, 'data': record}
+
+        except (aiohttp.ClientError, json.JSONDecodeError) as e:  # Handle specific exceptions
+            return {'process': 0, 'data': sbd}
+
+        except Exception as e:  # Catch unexpected errors
+            return {'process': 0, 'data': sbd}
+        #     r = await client.get(url, headers = headers)
+        #     data = await r.text()
+        #     data = json.loads(data)[0]
+        #     record = \
+        #                 data['SOBAODANH'] + ',' + \
+        #                 data['TOAN'] + ',' + \
+        #                 data['VAN'] + ',' + \
+        #                 data['NGOAI_NGU'] + ',' + \
+        #                 data['LY'] + ',' + \
+        #                 data['HOA'] + ',' + \
+        #                 data['SINH'] + ',' + \
+        #                 data['SU'] + ',' + \
+        #                 data['DIA'] + ',' + data['GIAO_DUC_CONG_DAN'] + ',' + data['MA_MON_NGOAI_NGU']
+        #     return {'process':1, 'data': record}
+        # except Exception as e:
+        #     return {'process':0, 'data': sbd}

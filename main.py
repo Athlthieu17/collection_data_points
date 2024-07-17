@@ -46,10 +46,10 @@ async def run_all_workers():
                 tasks.append(task)
 
             async for result in run_limit_worker(tasks, limit=100):
-                try:
-                    f.write(result + '\n')
-                except:
-                    error_sbd.append(result)
+                if result['process']:
+                    f.write(result['data'] + '\n')
+                else:
+                    error_sbd.append(result['data'])
                 # You can also process the result here if needed
 
             # Clear tasks for the next province (if you have multiple provinces)
